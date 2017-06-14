@@ -1,0 +1,59 @@
+<% @sectors.each do |s| %>
+  <% s_ids = Monitoring.where(sector_id: s).pluck(:sensor_id) %>
+  <% measurings =  MonitoringSensor.where(sensor_id: s_ids).order(sent_at: :asc).order(:sensor_id).last(s_ids.count) %>
+  <% average_monitoring = (measurings.pluck(:measuring).inject(0.0) { |sum, el| sum + el }.to_f / measurings.pluck(:measuring).size).round(0) if measurings.present?%>
+
+  <div class="mt">
+    <div class="showback">
+      <h4>
+        <i class="fa fa-angle-right"></i>
+        Sector <%= s.name.capitalize %> - Humedad del Suelo
+      </h4>
+      <h5>
+        <i class="fa fa-bullhorn"></i>
+        Restricciones
+        <% restriction = Restriction.where(sector_id: s).last %>
+        <span class="label label-danger">Minimo: <%= restriction.try(:minimum_value) %>%</span>
+        <span class="label label-danger">maximo: <%= restriction.try(:maximum_value) %>%</span>
+      </h5>
+      <h6>
+        <i class="fa fa-bar-chart"></i>
+        Ultimos Indicadores de hoy
+        <span class="label label-info">media: <%= average_monitoring %>%</span>
+        <span class="label label-warning">Minimo: <%= measurings.pluck(:measuring).min %>%</span>
+        <span class="label label-warning">maximo: <%= measurings.pluck(:measuring).max %>%</span>
+      </h6>
+
+      <div class="row">
+        <div class="">
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th>Ultima lectura</th>
+                <th>Sensor</th>
+                <th>Medicion Actual</th>
+                <th>Media</th>
+                <th>Mínima del Dia</th>
+                <th>Máxima del Día</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% Monitoring.where(sector_id: s).each do |m| %>
+              <% bg_alert = 'label-warning' if restriction.try(:minimum_value).present? && MonitoringSensor.where(sensor_id: m.sensor_id).last.try(:measuring).present? && restriction.minimum_value >= MonitoringSensor.where(sensor_id: m.sensor_id).last.try(:measuring).round(0) %>
+              <tr>
+                <% sent_at = MonitoringSensor.find_by(sensor_id: m.sensor_id).try(:sent_at).nil? ? Date.today : MonitoringSensor.find_by(sensor_id: m.sensor_id).try(:sent_at) %>
+                <td><%= sent_at.nil? ? '': sent_at.strftime("%F %T") %></td>
+                <td><%= m.sensor.id_sensor %></td>
+                <td class="<%= bg_alert %>"><%= MonitoringSensor.where(sensor_id: m.sensor_id).last.nil? ? '' : MonitoringSensor.where(sensor_id: m.sensor_id).last.measuring.round(0) %> %</td>
+                <td><%= MonitoringSensor.where(sensor_id: m.sensor_id).where("sent_at >= '#{Time.parse(sent_at.to_s).change(hour:0).strftime("%F %T")}' and sent_at <= '#{Time.parse(sent_at.to_s).change(hour:23).strftime("%F %T").to_s}'").average(:measuring).round(0) %> %</td>
+                <td><%= MonitoringSensor.where(sensor_id: m.sensor_id).where("sent_at >= '#{Time.parse(sent_at.to_s).change(hour:0).strftime("%F %T")}' and sent_at <= '#{Time.parse(sent_at.to_s).change(hour:23).strftime("%F %T").to_s}'").minimum(:measuring) %> %</td>
+                <td><%= MonitoringSensor.where(sensor_id: m.sensor_id).where("sent_at >= '#{Time.parse(sent_at.to_s).change(hour:0).strftime("%F %T")}' and sent_at <= '#{Time.parse(sent_at.to_s).change(hour:23).strftime("%F %T").to_s}'").maximum(:measuring) %> %</td>
+              </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+<% end %>

@@ -1,0 +1,40 @@
+<div class="mt">
+  <div class="showback">
+    <div class="panel">
+      <%= form_for :search, url: reports_url, method: :get do |f|%>
+        <div class="row">
+          <div class="form-group col-md-3 col-sm-3">
+            <%= f.label 'Sector'%>
+            <%= f.collection_select(:sector_id, @filter_sector.all, :id, :name,{prompt:'Selecciona Sector'}, {class:'form-control'}) %>
+          </div>
+          <div class="form-group col-md-3 col-sm-3">
+            <%= f.label 'Desde que fecha'%>
+            <%= f.text_field :start_date, class: 'datepicker form-control'%>
+          </div>
+          <div class="form-group col-md-3 col-sm-3">
+            <%= f.label 'Hasta que fecha'%>
+            <%= f.text_field :end_date, class: 'datepicker form-control'%>
+          </div>
+        </div>
+        <div class="pull-right">
+          <%= f.submit 'Buscar', class:'btn btn-info form-control'%>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>
+<% @sectors.each do |s|%>
+  <div class="mt">
+    <div class="showback">
+      <div class="panel">
+        <div class="panel-body">
+          <div class="panel-title">
+            Reporte del sector <%= s.name.capitalize %> - Mes Actual - Humedad del Suelo.
+          </div>
+          <%= line_chart Report.daily(s.id, @search_date), min: 0, max: 100, xtitle: "Fecha", ytitle: "humedad %", chart:{ zoomType: 'x'} %>
+        </div>
+      </div>
+
+    </div>
+  </div>
+<% end %>

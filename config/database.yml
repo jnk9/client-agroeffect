@@ -8,7 +8,7 @@ development:
   database: agro_development
   username: pguser
   password: admin
-  host: localhost
+  host: agroeffect.cl
 
 test:
   <<: *default

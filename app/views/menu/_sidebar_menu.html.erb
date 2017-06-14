@@ -1,0 +1,14 @@
+<ul id="slide-out" class="side-nav fixed green">
+  <div class="userView">
+    <div class="white-text">
+      Conectado <%= current_user.email%>
+    </div>
+    <li>
+      <a href="/"><%= inline_svg 'logo-2', class: 'logo' %></a>
+    </li>
+  </div>
+  <li><%= link_to 'Sectores', sectors_path, class: 'white-text center'%></li>
+  <li><%= link_to 'Reporte Grafico Semanal', reports_path, class: 'white-text center'%></li>
+  <li><%= link_to 'Reportes', full_report_reports_path, class: 'white-text center'%></li>
+  <li><%= link_to 'Salir', destroy_user_session_path, method: :delete, class: 'white-text center'%></li>
+</ul>

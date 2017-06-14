@@ -11,8 +11,14 @@ gem 'turbolinks', '~> 5'
 gem 'jbuilder', '~> 2.5'
 
 gem 'devise', github: 'plataformatec/devise'
-gem 'semantic-ui-sass', github: 'doabit/semantic-ui-sass'
+gem 'bootstrap-sass'
+gem 'bootstrap-datepicker-rails'
+gem "font-awesome-rails"
+gem 'jquery-ui-rails'
+gem 'chartkick'
 gem 'inline_svg'
+gem 'mongoid', '~> 6.1.0'
+gem 'will_paginate-bootstrap'
 
 group :development, :test do
   gem 'byebug', platform: :mri
